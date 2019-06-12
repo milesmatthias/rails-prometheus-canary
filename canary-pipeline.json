@@ -1,0 +1,455 @@
+{
+  "expectedArtifacts": [
+    {
+      "defaultArtifact": {
+        "id": "84ec5952-2277-4c30-a2cd-9f6c1fb6fb30",
+        "name": "gs://my-artifact-bucket/ex-rails-prometheus/charts/ex-rails-prometheus.tgz",
+        "reference": "gs://my-artifact-bucket/ex-rails-prometheus/charts/ex-rails-prometheus.tgz",
+        "type": "gcs/object"
+      },
+      "displayName": "ex-rails-prometheus-chart",
+      "id": "d378a881-d670-49fa-9b35-7fe51b7da20d",
+      "matchArtifact": {
+        "id": "9e7ea49f-d47d-4b5f-9cb2-d7bf230a2dd2",
+        "name": "gs://my-artifact-bucket/ex-rails-prometheus/charts/ex-rails-prometheus.tgz",
+        "type": "gcs/object"
+      },
+      "useDefaultArtifact": true,
+      "usePriorArtifact": false
+    },
+    {
+      "defaultArtifact": {
+        "id": "e3fc2b91-54a0-4a1b-8d40-d1b9cbca36e0",
+        "name": "gs://my-artifact-bucket/ex-rails-prometheus/values/values.yaml",
+        "reference": "gs://my-artifact-bucket/ex-rails-prometheus/values/values.yaml",
+        "type": "gcs/object"
+      },
+      "displayName": "values",
+      "id": "2070b3e3-9d6d-4255-a722-c66bf42466fc",
+      "matchArtifact": {
+        "id": "b5242f48-5d97-421b-8ea9-1f3eec33bca3",
+        "name": "gs://my-artifact-bucket/ex-rails-prometheus/values/values.yaml",
+        "type": "gcs/object"
+      },
+      "useDefaultArtifact": true,
+      "usePriorArtifact": false
+    },
+    {
+      "defaultArtifact": {
+        "id": "a2403c2a-db9c-411c-9e71-d1e0bf2db336",
+        "name": "gs://my-artifact-bucket/ex-rails-prometheus/values/values-dev.yaml",
+        "reference": "gs://my-artifact-bucket/ex-rails-prometheus/values/values-dev.yaml",
+        "type": "gcs/object"
+      },
+      "displayName": "values-dev",
+      "id": "82cea391-bd68-41e9-9934-25be7fb9be47",
+      "matchArtifact": {
+        "id": "ad9d3848-65d3-43c8-bd11-36336febfa1d",
+        "name": "gs://my-artifact-bucket/ex-rails-prometheus/values/values-dev.yaml",
+        "type": "gcs/object"
+      },
+      "useDefaultArtifact": true,
+      "usePriorArtifact": false
+    }
+  ],
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "mmatthias@google.com",
+  "limitConcurrent": true,
+  "parameterConfig": [
+    {
+      "default": "",
+      "description": "Image Tag",
+      "hasOptions": false,
+      "label": "Image Tag",
+      "name": "imageTag",
+      "options": [
+        {
+          "value": ""
+        }
+      ],
+      "pinned": false,
+      "required": false
+    }
+  ],
+  "stages": [
+    {
+      "evaluateOverrideExpressions": true,
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {},
+          "displayName": "dev-manifest-canary",
+          "id": "422454b3-ac78-4fe2-aee8-a74cb4a956fe",
+          "matchArtifact": {
+            "kind": "base64",
+            "name": "dev-manifest-canary",
+            "type": "embedded/base64"
+          },
+          "useDefaultArtifact": false
+        }
+      ],
+      "inputArtifacts": [
+        {
+          "account": "my-artifact-bucket",
+          "id": "d378a881-d670-49fa-9b35-7fe51b7da20d"
+        },
+        {
+          "account": "my-artifact-bucket",
+          "id": "82cea391-bd68-41e9-9934-25be7fb9be47"
+        }
+      ],
+      "name": "Bake Canary",
+      "namespace": "default",
+      "outputName": "dev-manifest-canary",
+      "overrides": {
+        "appName": "ex-rails-canary",
+        "imageTag": "${parameters.imageTag}"
+      },
+      "refId": "1",
+      "requisiteStageRefIds": [],
+      "templateRenderer": "HELM2",
+      "type": "bakeManifest"
+    },
+    {
+      "account": "my-gke-cluster",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactAccount": "embedded-artifact",
+      "manifestArtifactId": "422454b3-ac78-4fe2-aee8-a74cb4a956fe",
+      "moniker": {
+        "app": "ex-rails-prometheus"
+      },
+      "name": "Deploy Canary",
+      "refId": "2",
+      "relationships": {
+        "loadBalancers": [],
+        "securityGroups": []
+      },
+      "requiredArtifactIds": [],
+      "requisiteStageRefIds": [
+        "1"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "analysisType": "realTime",
+      "canaryConfig": {
+        "beginCanaryAnalysisAfterMins": "1",
+        "canaryAnalysisIntervalMins": "2",
+        "canaryConfigId": "fc30b59a-f179-4578-a26a-15bd03ab1460",
+        "lifetimeDuration": "PT0H3M",
+        "metricsAccountName": "my-gke-cluster",
+        "scopes": [
+          {
+            "controlLocation": "default",
+            "controlScope": "ex-rails-baseline",
+            "experimentLocation": "default",
+            "experimentScope": "ex-rails-canary",
+            "extendedScopeParams": {},
+            "scopeName": "default"
+          }
+        ],
+        "scoreThresholds": {
+          "marginal": "50",
+          "pass": "50"
+        },
+        "storageAccountName": "ci-cd-google-account"
+      },
+      "name": "Canary Analysis",
+      "refId": "5",
+      "requisiteStageRefIds": [
+        "2",
+        "7"
+      ],
+      "type": "kayentaCanary"
+    },
+    {
+      "account": "my-gke-cluster",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactAccount": "embedded-artifact",
+      "manifestArtifactId": "e894a742-d5da-46ca-9c06-a4da46f02208",
+      "manifests": [
+        {
+          "apiVersion": "apps/v1beta2",
+          "kind": "Deployment",
+          "metadata": {
+            "labels": {
+              "app": "ex-rails-prometheus-baseline",
+              "app.kubernetes.io/managed-by": "spinnaker",
+              "app.kubernetes.io/name": "ex-rails-prometheus"
+            },
+            "name": "ex-rails-prometheus",
+            "namespace": "default"
+          },
+          "spec": {
+            "selector": {
+              "matchLabels": {
+                "app": "ex-rails-prometheus-baseline"
+              }
+            },
+            "template": {
+              "metadata": {
+                "annotations": {
+                  "artifact.spinnaker.io/location": "default",
+                  "artifact.spinnaker.io/name": "ex-rails-prometheus",
+                  "artifact.spinnaker.io/type": "kubernetes/deployment",
+                  "moniker.spinnaker.io/application": "ex-rails-prometheus",
+                  "moniker.spinnaker.io/cluster": "deployment ex-rails-prometheus"
+                },
+                "labels": {
+                  "app": "ex-rails-prometheus-baseline",
+                  "app.kubernetes.io/managed-by": "spinnaker",
+                  "app.kubernetes.io/name": "ex-rails-prometheus"
+                }
+              },
+              "spec": {
+                "containers": [
+                  {
+                    "image": "gcr.io/my-registry/ex-rails-prometheus:c46c806",
+                    "name": "ex-rails-prometheus-baseline",
+                    "ports": [
+                      {
+                        "containerPort": 8080,
+                        "name": "ex-rails",
+                        "protocol": "TCP"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "v1",
+          "kind": "Service",
+          "metadata": {
+            "labels": {
+              "app": "ex-rails-prometheus-baseline"
+            },
+            "name": "ex-rails-prometheus-baseline",
+            "namespace": "default"
+          },
+          "spec": {
+            "ports": [
+              {
+                "name": "ex-rails",
+                "port": 8080,
+                "protocol": "TCP"
+              }
+            ],
+            "selector": {
+              "app": "ex-rails-prometheus-baseline"
+            },
+            "type": "ClusterIP"
+          }
+        }
+      ],
+      "moniker": {
+        "app": "ex-rails-prometheus"
+      },
+      "name": "Deploy Baseline",
+      "refId": "7",
+      "relationships": {
+        "loadBalancers": [],
+        "securityGroups": []
+      },
+      "requiredArtifactIds": [],
+      "requisiteStageRefIds": [
+        "12"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "account": "my-gke-cluster",
+      "app": "ex-rails-prometheus",
+      "cloudProvider": "kubernetes",
+      "cluster": "deployment ex-rails-prometheus",
+      "criteria": "newest",
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {
+            "customKind": true,
+            "id": "b7e18472-2594-480a-bf19-21468f295803"
+          },
+          "displayName": "ex-rails-baseline-image",
+          "id": "6f907ec9-3c64-4aa9-8041-d46b213c20c3",
+          "matchArtifact": {
+            "id": "c1c381b9-98d7-4819-a509-9e1917b380d4",
+            "name": "gcr.io/my-registry/ex-rails-prometheus",
+            "type": "docker/image"
+          },
+          "useDefaultArtifact": false,
+          "usePriorArtifact": false
+        }
+      ],
+      "kind": "deployment",
+      "location": "default",
+      "manifestName": "",
+      "mode": "dynamic",
+      "name": "Get Baseline Image",
+      "refId": "8",
+      "requisiteStageRefIds": [],
+      "type": "findArtifactsFromResource"
+    },
+    {
+      "account": "my-gke-cluster",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactAccount": "embedded-artifact",
+      "manifestArtifactId": "422454b3-ac78-4fe2-aee8-a74cb4a956fe",
+      "moniker": {
+        "app": "ex-rails-prometheus"
+      },
+      "name": "Deploy to Devint",
+      "refId": "9",
+      "relationships": {
+        "loadBalancers": [],
+        "securityGroups": []
+      },
+      "requisiteStageRefIds": [
+        "5"
+      ],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "trafficManagement": {
+        "enabled": false,
+        "options": {
+          "enableTraffic": false,
+          "services": []
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "account": "my-gke-cluster",
+      "app": "ex-rails-prometheus",
+      "cloudProvider": "kubernetes",
+      "kinds": [
+        "deployment",
+        "service",
+        "ServiceMonitor"
+      ],
+      "labelSelectors": {
+        "selectors": [
+          {
+            "key": "app",
+            "kind": "EQUALS",
+            "values": [
+              "ex-rails-baseline"
+            ]
+          }
+        ]
+      },
+      "location": "default",
+      "mode": "label",
+      "name": "Delete Baseline",
+      "options": {
+        "cascading": true
+      },
+      "refId": "10",
+      "requisiteStageRefIds": [
+        "5"
+      ],
+      "type": "deleteManifest"
+    },
+    {
+      "account": "my-gke-cluster",
+      "app": "ex-rails-prometheus",
+      "cloudProvider": "kubernetes",
+      "kinds": [
+        "deployment",
+        "service",
+        "ServiceMonitor"
+      ],
+      "labelSelectors": {
+        "selectors": [
+          {
+            "key": "app",
+            "kind": "EQUALS",
+            "values": [
+              "ex-rails-canary"
+            ]
+          }
+        ]
+      },
+      "location": "default",
+      "mode": "label",
+      "name": "Delete Canary",
+      "options": {
+        "cascading": true
+      },
+      "refId": "11",
+      "requisiteStageRefIds": [
+        "5"
+      ],
+      "type": "deleteManifest"
+    },
+    {
+      "evaluateOverrideExpressions": true,
+      "expectedArtifacts": [
+        {
+          "defaultArtifact": {},
+          "displayName": "dev-manifest-baseline",
+          "id": "e894a742-d5da-46ca-9c06-a4da46f02208",
+          "matchArtifact": {
+            "kind": "base64",
+            "name": "dev-manifest-baseline",
+            "type": "embedded/base64"
+          },
+          "useDefaultArtifact": false
+        }
+      ],
+      "inputArtifacts": [
+        {
+          "account": "my-artifact-bucket",
+          "id": "d378a881-d670-49fa-9b35-7fe51b7da20d"
+        },
+        {
+          "account": "my-artifact-bucket",
+          "id": "82cea391-bd68-41e9-9934-25be7fb9be47"
+        }
+      ],
+      "name": "Bake Baseline",
+      "namespace": "default",
+      "outputName": "dev-manifest-baseline",
+      "overrides": {
+        "appName": "ex-rails-baseline",
+        "imageRef": "${#stage(\"Get Baseline Image\")[\"context\"][\"artifacts\"][0][\"reference\"]}"
+      },
+      "refId": "12",
+      "requisiteStageRefIds": [
+        "8"
+      ],
+      "templateRenderer": "HELM2",
+      "type": "bakeManifest"
+    }
+  ],
+  "triggers": [
+    {
+      "attributeConstraints": {},
+      "enabled": true,
+      "payloadConstraints": {
+        "appName": "ex-rails-prometheus"
+      },
+      "pubsubSystem": "google",
+      "subscriptionName": "my-deployment-trigger",
+      "type": "pubsub"
+    }
+  ],
+  "updateTs": "1560352566072"
+}

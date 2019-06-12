@@ -1,0 +1,46 @@
+{
+  "applications": [
+    "ex-rails-prometheus"
+  ],
+  "classifier": {
+    "groupWeights": {
+      "Group 1": 100
+    }
+  },
+  "configVersion": "1",
+  "createdTimestamp": 1559342280318,
+  "createdTimestampIso": "2019-05-31T22:38:00.318Z",
+  "description": "",
+  "judge": {
+    "judgeConfigurations": {},
+    "name": "NetflixACAJudge-v1.0"
+  },
+  "metrics": [
+    {
+      "analysisConfigurations": {
+        "canary": {
+          "critical": true,
+          "direction": "decrease"
+        }
+      },
+      "groups": [
+        "Group 1"
+      ],
+      "name": "ex_rails_example_gauge",
+      "query": {
+        "customFilterTemplate": "service",
+        "customInlineTemplate": "",
+        "metricName": "ex_rails_example_gauge",
+        "serviceType": "prometheus",
+        "type": "prometheus"
+      },
+      "scopeName": "default"
+    }
+  ],
+  "name": "ex-rails-config",
+  "templates": {
+    "service": "service=\"${scope}\""
+  },
+  "updatedTimestamp": 1560292620888,
+  "updatedTimestampIso": "2019-06-11T22:37:00.888Z"
+}
