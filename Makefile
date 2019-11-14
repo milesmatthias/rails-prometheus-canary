@@ -14,14 +14,14 @@ PHONY: .version .app-version .image-name \
 
 
 build-image:
-	docker build -t $(RELEASE_IMAGE_NAME):latest -t $(RELEASE_IMAGE_NAME):$(SHA) .
+	docker build -t $(RELEASE_IMAGE_NAME):latest -t $(RELEASE_IMAGE_NAME):$(VERSION) .
 	docker push $(RELEASE_IMAGE_NAME):latest
-	docker push $(RELEASE_IMAGE_NAME):$(SHA)
+	docker push $(RELEASE_IMAGE_NAME):$(VERSION)
 
 build-tester-image:
-	docker build -t $(RELEASE_IMAGE_NAME):latest -t $(RELEASE_IMAGE_NAME):$(SHA) ./canary-tester/
+	docker build -t $(RELEASE_IMAGE_NAME):latest -t $(RELEASE_IMAGE_NAME):$(VERSION) ./canary-tester/
 	docker push $(RELEASE_IMAGE_NAME):latest
-	docker push $(RELEASE_IMAGE_NAME):$(SHA)
+	docker push $(RELEASE_IMAGE_NAME):$(VERSION)
 
 version:
 	@echo $(VERSION)
