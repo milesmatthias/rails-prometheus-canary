@@ -2,11 +2,9 @@ VERSION = $(shell git describe --long --dirty --always --tags)
 APP_VERSION = 0.1.0
 SHELL := /bin/bash
 
-PROJECT_NAME := ex-rails-prometheus
 DOCKER_REGISTRY ?= milesmatthias
-RELEASE_IMAGE_NAME ?= $(DOCKER_REGISTRY)/$(PROJECT_NAME)
+RELEASE_IMAGE_NAME ?= $(DOCKER_REGISTRY)/ex-rails-prometheus
 CANARY_TESTER_IMAGE_NAME ?= $(DOCKER_REGISTRY)/ex-rails-canary-tester
-
 TAG := "latest"
 
 
@@ -29,7 +27,7 @@ gen-manifests:
 	helm template helm/ex-rails-prometheus --set imageTag=$(TAG)
 
 gen-tester-manifests:
-	helm template helm/canary-tester --set imageTag=$(TAG)
+	helm template helm/ex-rails-canary-tester --set imageTag=$(TAG)
 
 version:
 	@echo $(VERSION)
