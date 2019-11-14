@@ -1,15 +1,16 @@
 {
   "applications": [
-    "ex-rails-prometheus"
+    "canaryrails"
   ],
   "classifier": {
     "groupWeights": {
       "Group 1": 100
+    },
+    "scoreThresholds": {
+      "marginal": 50,
+      "pass": 50
     }
   },
-  "configVersion": "1",
-  "createdTimestamp": 1559342280318,
-  "createdTimestampIso": "2019-05-31T22:38:00.318Z",
   "description": "",
   "judge": {
     "judgeConfigurations": {},
@@ -41,7 +42,5 @@
   "name": "ex-rails-config",
   "templates": {
     "service": "service=\"${scope}\""
-  },
-  "updatedTimestamp": 1560292620888,
-  "updatedTimestampIso": "2019-06-11T22:37:00.888Z"
+  }
 }
