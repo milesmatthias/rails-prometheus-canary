@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ default .Chart.Name .Values.appName }}
+  namespace: default
+  labels:
+    app: {{ default .Chart.Name .Values.appName }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.port }}
+      protocol: TCP
+      name: ex-rails
+  selector:
+    app: {{ default .Chart.Name .Values.appName }}

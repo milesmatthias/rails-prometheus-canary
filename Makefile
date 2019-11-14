@@ -7,6 +7,8 @@ DOCKER_REGISTRY ?= milesmatthias
 RELEASE_IMAGE_NAME ?= $(DOCKER_REGISTRY)/$(PROJECT_NAME)
 CANARY_TESTER_IMAGE_NAME ?= $(DOCKER_REGISTRY)/ex-rails-canary-tester
 
+TAG := "latest"
+
 
 PHONY: .version .app-version .image-name \
 	.curl-canary .curl-baseline .curl-devint \
@@ -19,9 +21,15 @@ build-image:
 	docker push $(RELEASE_IMAGE_NAME):$(VERSION)
 
 build-tester-image:
-	docker build -t $(RELEASE_IMAGE_NAME):latest -t $(RELEASE_IMAGE_NAME):$(VERSION) ./canary-tester/
-	docker push $(RELEASE_IMAGE_NAME):latest
-	docker push $(RELEASE_IMAGE_NAME):$(VERSION)
+	docker build -t $(CANARY_TESTER_IMAGE_NAME):latest -t $(CANARY_TESTER_IMAGE_NAME):$(VERSION) ./canary-tester/
+	docker push $(CANARY_TESTER_IMAGE_NAME):latest
+	docker push $(CANARY_TESTER_IMAGE_NAME):$(VERSION)
+
+gen-manifests:
+	helm template helm/ex-rails-prometheus --set imageTag=$(TAG)
+
+gen-tester-manifests:
+	helm template helm/canary-tester --set imageTag=$(TAG)
 
 version:
 	@echo $(VERSION)

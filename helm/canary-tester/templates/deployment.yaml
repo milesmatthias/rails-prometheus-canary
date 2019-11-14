@@ -1,0 +1,23 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ default .Chart.Name .Values.appName }}
+  namespace: default
+  labels:
+    app: {{ default .Chart.Name .Values.appName }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ default .Chart.Name .Values.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ default .Chart.Name .Values.appName }}
+    spec:
+      containers:
+        - name: {{ default .Chart.Name .Values.appName }}
+          {{ if .Values.imageRef }}
+          image: {{ .Values.imageRef }}
+          {{ else }}
+          image: {{ .Values.imageName }}:{{ required ".Values.imageTag required" .Values.imageTag }}
+          {{ end }}

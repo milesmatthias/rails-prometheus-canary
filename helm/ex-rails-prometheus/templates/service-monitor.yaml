@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: {{ default .Chart.Name .Values.appName }}
+    release: prometheus-operator
+  name: {{ default .Chart.Name .Values.appName }}-metrics
+spec:
+  endpoints:
+    - interval: 10s
+      path: /metrics
+      targetPort: 8080
+  selector:
+    matchLabels:
+      app: {{ default .Chart.Name .Values.appName }}
+    namespaceSelector:
+      any: true
