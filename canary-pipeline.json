@@ -2,7 +2,7 @@
   "appConfig": {},
   "expectedArtifacts": [],
   "keepWaitingPipelines": false,
-  "lastModifiedBy": "mmatthias@google.com",
+  "lastModifiedBy": "anonymous",
   "limitConcurrent": true,
   "parameterConfig": [],
   "stages": [
@@ -126,38 +126,6 @@
         }
       },
       "type": "deployManifest"
-    },
-    {
-      "analysisType": "realTime",
-      "canaryConfig": {
-        "beginCanaryAnalysisAfterMins": "1",
-        "canaryAnalysisIntervalMins": "2",
-        "canaryConfigId": "fc30b59a-f179-4578-a26a-15bd03ab1460",
-        "lifetimeDuration": "PT0H3M",
-        "metricsAccountName": "my-gke-cluster",
-        "scopes": [
-          {
-            "controlLocation": "default",
-            "controlScope": "ex-rails-prometheus-baseline",
-            "experimentLocation": "default",
-            "experimentScope": "ex-rails-prometheus-canary",
-            "extendedScopeParams": {},
-            "scopeName": "default"
-          }
-        ],
-        "scoreThresholds": {
-          "marginal": "50",
-          "pass": "50"
-        },
-        "storageAccountName": "ci-cd-google-account"
-      },
-      "name": "Canary Analysis",
-      "refId": "5",
-      "requisiteStageRefIds": [
-        "2",
-        "7"
-      ],
-      "type": "kayentaCanary"
     },
     {
       "account": "app-cluster",
@@ -388,7 +356,7 @@
         "securityGroups": []
       },
       "requisiteStageRefIds": [
-        "5"
+        "12"
       ],
       "skipExpressionEvaluation": false,
       "source": "text",
@@ -429,7 +397,7 @@
       },
       "refId": "10",
       "requisiteStageRefIds": [
-        "5"
+        "12"
       ],
       "type": "deleteManifest"
     },
@@ -461,11 +429,43 @@
       },
       "refId": "11",
       "requisiteStageRefIds": [
-        "5"
+        "12"
       ],
       "type": "deleteManifest"
+    },
+    {
+      "analysisType": "realTime",
+      "canaryConfig": {
+        "canaryAnalysisIntervalMins": "2",
+        "canaryConfigId": "08f917f0-099c-482e-a8aa-0f2f0e6c2ec7",
+        "lifetimeDuration": "PT0H2M",
+        "metricsAccountName": "app-cluster",
+        "scopes": [
+          {
+            "controlLocation": "default",
+            "controlScope": "ex-rails-prometheus-baseline",
+            "experimentLocation": "default",
+            "experimentScope": "ex-rails-prometheus-canary",
+            "extendedScopeParams": {},
+            "scopeName": "default"
+          }
+        ],
+        "scoreThresholds": {
+          "marginal": "50",
+          "pass": "50"
+        },
+        "storageAccountName": "gcs-canary"
+      },
+      "isNew": true,
+      "name": "Canary Analysis",
+      "refId": "12",
+      "requisiteStageRefIds": [
+        "7",
+        "2"
+      ],
+      "type": "kayentaCanary"
     }
   ],
   "triggers": [],
-  "updateTs": "1560352566072"
+  "updateTs": "1573770274000"
 }
